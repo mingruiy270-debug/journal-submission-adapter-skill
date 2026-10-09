@@ -29,7 +29,7 @@ Title: name the subject and distinguish the contribution. Choose descriptive or 
 
 Abstract: lead with the question, not methods inventory. Give the decisive observations and necessary numbers. Separate different endpoints and designs. Follow the official structured/unstructured rule and word limit. Define essential abbreviations; remove those used once. Closing interpretation should answer the opening question.
 
-In a structured abstract, keep each section's job: Background establishes the problem/question; Methods states the design; Results gives the findings; Conclusions interprets the answer. Finding-first Results and cover-letter writing does not mean moving results into the Background subsection.
+First transcribe the target article type's exact required abstract headings; do not inherit them from the source journal or a published article. Some journals require Background/Results/Conclusions without a Methods heading. Place a brief design sentence where permitted rather than adding an unrequested section. When a Methods subsection is required, it states the design. Background establishes the problem/question, Results gives the findings, and Conclusions interprets the answer. Finding-first Results and cover-letter writing does not mean moving results into the Background subsection.
 
 Introduction: establish the biological problem, identify the specific unresolved relation and explain why this design can address it. Keep general background short. Do not declare every technique a research gap.
 

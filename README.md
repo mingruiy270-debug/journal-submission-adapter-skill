@@ -54,7 +54,7 @@ skills/journal-submission-adapter 到当前工作区的 skills 目录。
 | 能力 | 依赖 |
 | --- | --- |
 | 核心检索、研读、叙事适配 | agent 原生联网、网页阅读和文件访问 |
-| 明确 URL 的全文下载 | Python 3.10+，仅标准库；支持环境中的 HTTP/HTTPS 代理 |
+| 明确 URL 的全文下载 | Python 3.10+，默认标准库；可选 requests 传输，支持 HTTP/HTTPS 代理 |
 | PDF 分页文本提取 | 可选 PyMuPDF，见 `requirements-reading.txt` |
 | DOCX 操作 | 推荐 Word MCP；用户要求 MCP 或含 Zotero 活引文时必须使用 |
 | 活引文新增/刷新/样式转换 | Word、Zotero、已连接的 Word MCP 及相应 Zotero skill |
@@ -72,6 +72,12 @@ python skills/journal-submission-adapter/scripts/extract_pdf.py /work/papers/P01
 ```
 
 安装后的路径是实际 skill 目录下的 `scripts/`。下载脚本不会检索、破解访问限制或自动扩大下载范围；最多处理清单内 20 篇，正常任务通常只需 3–5 篇。它检查传输与文件类型，并不证明文章身份或内容已经读过。
+
+遇到正常 HTTP 客户端兼容性问题时，可安装 `skills/journal-submission-adapter/requirements-network.txt`，显式选择 `--transport requests`。不会自动切换或循环重试，也不会绕过登录、验证码或付费墙。两种传输都保留大小上限、伪 PDF 拒绝和已有文件保护。大 PDF 可明确调整 `--max-mb`（最大 100），不扩大选文范围。
+
+两个客户端均最多跟随五次普通重定向，逐跳验证地址并关闭中间响应，不自动读入重定向正文。Word MCP 接口缺少打开/关闭工具时，可用限定到目标文件的原生生命周期桥接；编辑、排版和保存仍走 MCP。重复搜索位置不能被当作完整搜索结果。
+
+在线先发表页面即使标注 OA/full access，也可能只有摘要；需读取其 PDF 正文。期刊适配还会核对最新作者修改稿，以及目标期刊规定的准确摘要章节，不能沿用旧工作区或其他刊物模板。
 
 退出码：下载 `0` 表示所有请求均保存成功，`2` 表示有人工补充或已有未检查文件，`1` 表示输入/执行错误。提取 `2` 表示存在低文本页，需检查页面或 OCR。已有文件不覆盖。
 
@@ -97,7 +103,7 @@ python -m unittest discover -s tests -v
 
 本 skill 不保证送审或录用，也不能通过语言调整解决真实科学矛盾。它会把“已完成适配”“必需信息尚缺”“科学口径仍未解决”分别报告。
 
-首次发布的验证范围见 [docs/validation.md](docs/validation.md)：18 项本机测试已通过；独立实网测试验证了官网规则核查、虚拟稿件适配和访问失败交接，但未完成三篇全文研读。Word MCP 已通过握手检查，本轮未修改真实手稿。
+当前 1.0.1 的验证范围见 [docs/validation.md](docs/validation.md)：29 项本机测试通过；真实稿件已完成一次 Cell & Bioscience 适配，下载并研读三篇近期全文，通过 Word MCP 修改派生稿与投稿信，保留全部 70 个引文字段和书目字段。未执行实际投稿，也未测试引文新增、重排或 Zotero Refresh。公开仓库不包含这次真实稿件或全文论文。
 
 ## 开源与参考
 

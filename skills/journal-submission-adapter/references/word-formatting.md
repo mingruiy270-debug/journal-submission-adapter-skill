@@ -6,6 +6,8 @@ For DOCX, discover the host's available Word MCP tools and confirm that they act
 
 Use Word MCP for opening/derived-copy creation, targeted edits, paragraph/style changes, page layout, headers/footers, numbering, revisions, saving and visual inspection. Query actual tool schemas; tool names vary. If the server is exposed through stdio rather than native registration, an MCP client may connect to that installed server. This is still an MCP workflow, not permission to replace its writes with arbitrary COM commands.
 
+Some live servers only operate on already-open documents and expose no open/close tool. A narrowly scoped native lifecycle bridge may open the named document and close only task-owned files; verify the actual Office application and full path. Content edits, formatting and save/derived-copy creation remain MCP operations. Do not mistake a text snapshot for a visual capture.
+
 Word MCP is mandatory for a live Zotero-linked document and when the user requests it. If it is unavailable, continue literature work and produce the adaptation plan, but identify the Word-editing blocker. For a field-free DOCX, an explicitly accepted alternative may be used when the host has no Word MCP; clearly report the route. Do not convert a linked manuscript to Markdown and rebuild it.
 
 ## Preflight
@@ -20,6 +22,8 @@ If a copy already exists and user edits are present, work with them. Do not over
 ## Live Zotero
 
 Read the local Zotero citation skill before insertion or style conversion. Keep complete field payloads and item identity, not just displayed reference numbers. Broad paragraph replacement can delete a field; prefer bounded text islands around it or field-aware operations.
+
+Validate returned search ranges before writing. Repeated identical hits, a result-count cap or partial errors do not establish complete coverage. Deduplication prevents duplicate writes but cannot recover omitted hits; use verified paragraph/range data or another supported MCP operation when completeness matters. Preserve field boundaries and check the intended range's actual text.
 
 For changed scientific citations, match the actual library item and metadata, insert using the existing integration, and run Zotero's real Refresh. For section reordering or style conversion, refresh so numbering/order follow the document. Field counts alone do not prove validity.
 
@@ -44,6 +48,8 @@ If the journal permits format-free initial submission, keep an existing readable
 ## Postflight
 
 Save through MCP, close/reopen the final derived document and inspect content and layout. Check the first page, all changed sections, representative image/table pages, bibliography and any known crowded areas. Detect clipped tables, captions separated from their figures, overlapping headers, duplicate page numbers and oversmall text.
+
+Check effective paragraph/run formatting after text insertion: new prose can inherit heading boldness or keep-with-next rules. Explicitly restore intended body formatting without stripping scientific italics, superscripts or field structure. For captures, verify the visible page/anchor rather than relying on a requested page number alone.
 
 Use Word MCP snapshot/layout tools when available. Do not generate an extra PDF if the user does not need one; temporary rendering, if required for inspection, stays in the working area. An empty layout-diagnostics list is useful but not a substitute for visual review.
 

@@ -1,29 +1,31 @@
 # Validation Scope
 
-Checked locally on 2026-10-09. This records the scope of the first release, not a guarantee of editorial acceptance or successful access to every publisher.
+Checked locally on 2026-10-09 for version 1.0.1. This is a bounded execution record, not a guarantee of access to every publisher, submission readiness or editorial acceptance.
 
-## Executed
+## Automated Tests
 
-- Codex skill-creator structural validation: passed.
-- Python compilation and bundled-resource link checks: passed.
-- 18 unit/integration tests: passed, including download failures, existing-file protection, portable filenames, safe network diagnostics, real PDF parsing and a local HTTP-to-PDF-to-page-text transaction.
-- Word MCP handshake: passed; 122 tools listed, including 46 live tools. No real manuscript was opened or edited.
-- Independent native-browsing forward test on an explicitly synthetic manuscript: produced a current official-requirements table, selected-paper/reading record, revised abstract and cover-letter core, and review findings.
+29 unit/integration tests passed with the optional requests and PyMuPDF dependencies installed. Coverage includes PDF/HTML discrimination, declared and streamed size limits, existing-file protection, portable names, safe query-free diagnostics, actual PDF parsing, text/page locators, and a local HTTP-to-PDF-to-text transaction using both transports. Redirect tests include a large 302 body followed by a small PDF, invalid/missing destinations and bounded loops. Both transports explicitly handle redirects without reading intermediate bodies.
 
-## Live Access Limits
+Skill-creator structural validation, compilation and bundled-resource link checks are performed separately; automated helper tests do not execute scientific reading or Word editing.
 
-Three publisher PDF links tested by the main agent returned non-PDF responses and were rejected. The independent test's ordinary requests obtained no local full-text files. It read an abstract, a partial Introduction and a substantial but incomplete HTML article. It explicitly did not report three full-paper readings or completed paper-informed submission preparation.
+## Real Manuscript Run
 
-These outcomes validate failure handling and honest completion reporting, not successful publisher acquisition or a complete real-paper adaptation. Manual title/DOI/official-link handoff remains available. No access challenge was bypassed, no private manuscript was uploaded and no hash manifest was generated.
+A local, unpublished multi-omics manuscript was adapted for Cell & Bioscience using native web discovery of current official instructions and three publisher-verified research articles from the preceding three months. All three full PDFs were acquired and extracted locally. Relevant Introduction, Methods, Results, Discussion and main legends were actually read; main figures were visually inspected. Two paper readings received a disjoint subagent review. Individual reference lists and separately hosted supplements were not independently reviewed.
 
-## Corrections From Validation
+The publisher's online-first HTML pages did not expose complete article bodies. The standard-library PDF transport returned HTML and was correctly rejected. Explicit ordinary requests transport through the user's configured proxy acquired the PDFs. A subsequent independent code review found automatic redirect-body consumption; this was fixed for both transports and covered by regression tests. This does not establish all proxy, TLS or institutional-access routes.
 
-The skill distinguishes browser-readable fallback from local acquisition, and selected-paper count from completed-reading count. Partial reading can support only section-specific observations. Download failures now record safe error classes/categories without exception messages or URL query secrets. Narrative guidance explicitly checks abstract endings and cover letters for repeated negative limitations.
+An installed stdio Word MCP was connected successfully (122 tools, 46 live). It edited title, the official three-section abstract, Introduction, Results headings, Discussion and cover letter in derived DOCX files, then applied submission formatting and saved/reopened them. This server lacked open/close tools, so a narrow Office lifecycle bridge opened named files and closed task-owned documents. All content, formatting and SaveAs writes used MCP.
 
-A narrow local writing-regression pass reduced repeated defensive negations while preserving the synthetic numerical results. The follow-up review also made structured-abstract section roles explicit, so finding-first wording is not interpreted as placing Results in Background. This regression did not add full-paper coverage or exercise Word formatting.
+Read-only OOXML comparisons confirmed all 70 complete Zotero citation payloads and the bibliography field were unchanged, together with the editable table and all eight embedded figure media files. The eight separate figure files were also unchanged. No citations were added, reordered or restyled; Zotero Refresh was therefore not invoked. Field preservation here is not proof that insertion or Refresh was tested.
 
-The portable-filename checks reject case-insensitive collisions and Windows reserved names. Optional PDF dependencies are bundled inside the installable skill; their minimum version matches the actual `pymupdf` module interface.
+Word captures and page text were inspected for the title/abstract, representative changed sections, table, figures, references and one-page cover letter. Search results that repeated table positions and inherited paragraph formatting were handled explicitly. A source statistical annotation remained inconsistent with its reported adjustment; it was reported as unresolved, not cosmetically certified. No analysis was rerun to resolve it.
 
-## Not Covered
+The authenticated journal portal, actual file upload, reviewer-token validity and submission were not tested. No manuscript, author details, downloaded full papers or confidential access credentials were placed in this public repository. No hash manifest was generated.
 
-Live Zotero insertion/Refresh, Word document editing, all publisher/institutional access routes, OCR quality, a full comparable-paper reading set, and an actual journal portal upload were not exercised by this release test. The skill requires their relevant checks during a real manuscript task instead of inferring success from these helper tests.
+## Earlier Synthetic Test
+
+The initial release included an independent synthetic-manuscript forward test of requirements discovery, partial accessible literature, prose adaptation and truthful access-failure handoff. It did not complete three full-paper readings or Word editing. The real run above extends that coverage without retroactively changing the earlier outcome.
+
+## Remaining Limits
+
+Live citation insertion, citation reorder/style conversion and actual Zotero Refresh; OCR quality; every publisher/access route; a full scientific reanalysis; and authenticated submission form validation remain untested. Behavioral scenarios are test specifications unless an execution above explicitly covers them.

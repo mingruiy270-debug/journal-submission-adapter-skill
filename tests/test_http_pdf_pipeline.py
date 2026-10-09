@@ -13,6 +13,11 @@ try:
 except ImportError:
     pymupdf = None
 
+try:
+    import requests
+except ImportError:
+    requests = None
+
 ROOT = Path(__file__).resolve().parents[1] / "skills/journal-submission-adapter/scripts"
 
 
@@ -37,6 +42,16 @@ class HttpPipelineTests(unittest.TestCase):
 
         class Handler(BaseHTTPRequestHandler):
             def do_GET(self):
+                if self.path == '/redirect':
+                    self.send_response(302)
+                    self.send_header('Location', '/paper.pdf')
+                    self.send_header('Content-Length', '4096')
+                    self.end_headers()
+                    try:
+                        self.wfile.write(b'x' * 4096)
+                    except (BrokenPipeError, ConnectionResetError):
+                        pass
+                    return
                 self.send_response(200)
                 self.send_header("Content-Type", "application/pdf")
                 self.send_header("Content-Length", str(len(data)))
@@ -54,15 +69,19 @@ class HttpPipelineTests(unittest.TestCase):
             article = {"id": "P01", "title": "A synthetic article", "journal": "Synthetic Journal",
                        "published_online": "2026-10-01", "landing_url": url, "full_text_url": url,
                        "format": "pdf", "access": "user_authorized"}
-            with tempfile.TemporaryDirectory() as folder, patch.dict("os.environ", {"NO_PROXY": "127.0.0.1"}):
-                result = acquisition.acquire([article], Path(folder), pause=0, timeout=3)[0]
-                self.assertEqual(result["status"], "downloaded")
-                pdf = Path(folder) / "P01.pdf"
-                self.assertEqual(pdf.read_bytes(), data)
-                text = Path(folder) / "P01.txt"
-                parsed = extraction.extract(pdf, text)
-                self.assertEqual(parsed["status"], "text_extracted_not_read")
-                self.assertIn("biological question", text.read_text(encoding="utf-8"))
+            for transport in (["urllib", "requests"] if requests else ["urllib"]):
+                with self.subTest(transport=transport), tempfile.TemporaryDirectory() as folder, patch.dict("os.environ", {"NO_PROXY": "127.0.0.1"}):
+                    redirected, _, _ = acquisition.fetch(
+                        url.replace('/paper.pdf', '/redirect'), 'pdf', 3, len(data)+1, transport)
+                    self.assertEqual(redirected, data)
+                    result = acquisition.acquire([article], Path(folder), pause=0, timeout=3, transport=transport)[0]
+                    self.assertEqual(result["status"], "downloaded")
+                    pdf = Path(folder) / "P01.pdf"
+                    self.assertEqual(pdf.read_bytes(), data)
+                    text = Path(folder) / "P01.txt"
+                    parsed = extraction.extract(pdf, text)
+                    self.assertEqual(parsed["status"], "text_extracted_not_read")
+                    self.assertIn("biological question", text.read_text(encoding="utf-8"))
         finally:
             server.shutdown()
             server.server_close()

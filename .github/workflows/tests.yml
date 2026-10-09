@@ -16,4 +16,5 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install -r requirements-reading.txt
+      - run: python -m pip install -r skills/journal-submission-adapter/requirements-network.txt
       - run: python -m unittest discover -s tests -v

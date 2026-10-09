@@ -13,8 +13,32 @@ import time
 from datetime import date, datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlsplit, urlunsplit
-from urllib.request import Request, urlopen
+from urllib.parse import urljoin, urlsplit, urlunsplit
+from urllib.request import HTTPRedirectHandler, Request, build_opener
+
+REDIRECT_CODES = {301, 302, 303, 307, 308}
+MAX_REDIRECTS = 5
+
+
+class NoAutomaticRedirects(HTTPRedirectHandler):
+    def redirect_request(self, *_):
+        return None
+
+
+def urlopen(request, *, timeout):
+    # Default redirect handlers may consume an unbounded intermediate body.
+    return build_opener(NoAutomaticRedirects()).open(request, timeout=timeout)
+
+
+def redirect_target(current: str, location: str | None, hop: int) -> str:
+    if hop >= MAX_REDIRECTS:
+        raise DownloadError("redirect_limit")
+    if not location:
+        raise DownloadError("redirect_missing_location")
+    try:
+        return valid_url(urljoin(current, location))
+    except ValueError as exc:
+        raise DownloadError("invalid_redirect_url") from exc
 
 
 class DownloadError(Exception):
@@ -101,25 +125,76 @@ def read_manifest(path: Path) -> list[dict]:
     return articles
 
 
-def fetch(url: str, expected_format: str, timeout: float, max_bytes: int) -> tuple[bytes, str, str]:
+def fetch(url: str, expected_format: str, timeout: float, max_bytes: int,
+          transport: str = "urllib") -> tuple[bytes, str, str]:
     request = Request(valid_url(url), headers={
         "User-Agent": "journal-submission-adapter/1.0 (selected academic full-text retrieval)",
         "Accept": "application/pdf,text/html;q=0.9,application/xhtml+xml;q=0.8",
     })
-    try:
-        with urlopen(request, timeout=timeout) as response:
-            final_url = valid_url(response.geturl())
-            mime = response.headers.get_content_type()
-            declared = response.headers.get("Content-Length")
-            if declared and declared.isdigit() and int(declared) > max_bytes:
-                raise DownloadError("size_limit")
-            data = response.read(max_bytes + 1)
-            if len(data) > max_bytes:
-                raise DownloadError("size_limit")
-    except HTTPError as exc:
-        raise DownloadError(f"http_{exc.code}") from exc
-    except (URLError, TimeoutError, OSError, http.client.HTTPException) as exc:
-        raise DownloadError("network_error", **transport_diagnostic(exc)) from exc
+    if transport == "requests":
+        try:
+            import requests
+        except ImportError as exc:
+            raise DownloadError("optional_dependency_missing_requests") from exc
+        try:
+            current = url
+            for hop in range(MAX_REDIRECTS + 1):
+                with requests.get(current, headers=dict(request.header_items()), timeout=timeout,
+                                  stream=True, allow_redirects=False) as response:
+                    if response.status_code in REDIRECT_CODES:
+                        current = redirect_target(current, response.headers.get("Location"), hop)
+                        continue
+                    if response.status_code >= 400:
+                        raise DownloadError(f"http_{response.status_code}")
+                    final_url = valid_url(response.url)
+                    mime = response.headers.get("Content-Type", "").split(";", 1)[0].strip().lower()
+                    declared = response.headers.get("Content-Length")
+                    if declared and declared.isdigit() and int(declared) > max_bytes:
+                        raise DownloadError("size_limit")
+                    chunks = []
+                    size = 0
+                    for chunk in response.iter_content(chunk_size=64 * 1024):
+                        size += len(chunk)
+                        if size > max_bytes:
+                            raise DownloadError("size_limit")
+                        chunks.append(chunk)
+                    data = b"".join(chunks)
+                    break
+        except requests.RequestException as exc:
+            category = ("tls_error" if isinstance(exc, requests.exceptions.SSLError) else
+                        "timeout" if isinstance(exc, requests.exceptions.Timeout) else
+                        "connection_error" if isinstance(exc, requests.exceptions.ConnectionError) else
+                        "transport_error")
+            raise DownloadError("network_error", error_type=type(exc).__name__, category=category) from exc
+    elif transport == "urllib":
+        try:
+            current = url
+            for hop in range(MAX_REDIRECTS + 1):
+                try:
+                    response = urlopen(Request(current, headers=dict(request.header_items())), timeout=timeout)
+                except HTTPError as exc:
+                    if exc.code not in REDIRECT_CODES:
+                        raise
+                    response = exc
+                with response:
+                    if getattr(response, "code", None) in REDIRECT_CODES:
+                        current = redirect_target(current, response.headers.get("Location"), hop)
+                        continue
+                    final_url = valid_url(response.geturl())
+                    mime = response.headers.get_content_type()
+                    declared = response.headers.get("Content-Length")
+                    if declared and declared.isdigit() and int(declared) > max_bytes:
+                        raise DownloadError("size_limit")
+                    data = response.read(max_bytes + 1)
+                    if len(data) > max_bytes:
+                        raise DownloadError("size_limit")
+                    break
+        except HTTPError as exc:
+            raise DownloadError(f"http_{exc.code}") from exc
+        except (URLError, TimeoutError, OSError, http.client.HTTPException) as exc:
+            raise DownloadError("network_error", **transport_diagnostic(exc)) from exc
+    else:
+        raise ValueError("Transport must be urllib or requests.")
     if not data:
         raise DownloadError("empty_response")
     if expected_format == "pdf":
@@ -135,9 +210,11 @@ def fetch(url: str, expected_format: str, timeout: float, max_bytes: int) -> tup
 
 
 def acquire(articles: list[dict], out: Path, *, timeout: float = 30, max_bytes: int = 50 * 1024**2,
-            pause: float = 1) -> list[dict]:
+            pause: float = 1, transport: str = "urllib") -> list[dict]:
     if timeout <= 0 or max_bytes <= 0 or pause < 0:
         raise ValueError("Timeout/size must be positive and pause nonnegative.")
+    if transport not in {"urllib", "requests"}:
+        raise ValueError("Transport must be urllib or requests.")
     out.mkdir(parents=True, exist_ok=True)
     results = []
     for index, item in enumerate(articles):
@@ -147,6 +224,7 @@ def acquire(articles: list[dict], out: Path, *, timeout: float = 30, max_bytes: 
             "journal": item["journal"], "published_online": item["published_online"],
             "landing_url": public_url(item["landing_url"]), "access": item["access"],
             "format": item["format"], "local_path": str(destination.resolve()),
+            "transport": transport,
             "identity_verified": False, "reading_status": "not_read",
         }
         url = item.get("full_text_url", "")
@@ -156,7 +234,7 @@ def acquire(articles: list[dict], out: Path, *, timeout: float = 30, max_bytes: 
             row.update(status="existing_not_checked", reason="original_not_overwritten")
         else:
             try:
-                data, mime, final_url = fetch(url, item["format"], timeout, max_bytes)
+                data, mime, final_url = fetch(url, item["format"], timeout, max_bytes, transport)
                 with destination.open("xb") as handle:
                     handle.write(data)
                 row.update(status="downloaded", bytes=len(data), mime=mime, final_url=final_url)
@@ -182,13 +260,15 @@ def main() -> int:
     parser.add_argument("--timeout", type=float, default=30)
     parser.add_argument("--max-mb", type=int, choices=range(1, 101), default=50)
     parser.add_argument("--pause", type=float, default=1)
+    parser.add_argument("--transport", choices=["urllib", "requests"], default="urllib",
+                        help="Explicit ordinary HTTP transport; requests is an optional dependency.")
     args = parser.parse_args()
     try:
         articles = read_manifest(args.manifest)
         if args.report.exists():
             raise ValueError("Report already exists; choose a new report path.")
         results = acquire(articles, args.out, timeout=args.timeout,
-                          max_bytes=args.max_mb * 1024**2, pause=args.pause)
+                          max_bytes=args.max_mb * 1024**2, pause=args.pause, transport=args.transport)
         report = {"checked_at_utc": datetime.now(timezone.utc).isoformat(), "results": results}
         args.report.parent.mkdir(parents=True, exist_ok=True)
         with args.report.open("x", encoding="utf-8") as handle:

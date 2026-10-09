@@ -40,6 +40,10 @@ Please download these full papers and place them in the working papers folder:
 
 When full HTML is used, save it locally and read the actual article sections. Figures may need the publisher's separate figure page. Do not automatically download SI; ask when a missing method or figure legend materially affects comparison.
 
+For online-first papers, OA/full-access HTML can contain only the abstract and back matter. Inspect Introduction/Methods/Results/Discussion coverage before declaring full-text access; use the verified PDF link when available. A `downloaded` HTML status validates transport, not completeness.
+
+The downloader defaults to standard-library `urllib`. A separately installed `requests` package can be selected with `--transport requests`, using the same size/type checks and ordinary HTTP headers. Both support HTTP(S) proxy environment settings. Do not automatically loop transports after access denial or browser challenges. One successful PDF route does not validate the failed route or prove scientific reading.
+
 ## Per-Paper Reading Card
 
 Keep cards analytical rather than copying the paper. Use PDF page/figure numbers or HTML section headings as locators.
