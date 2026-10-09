@@ -1,0 +1,6 @@
+interface:
+  display_name: "Journal Submission Adapter"
+  short_description: "Read recent papers and adapt manuscripts for a journal"
+  default_prompt: "Use $journal-submission-adapter to read recent comparable papers from my target journal, adapt my manuscript's narrative, and prepare a checked initial-submission package."
+policy:
+  allow_implicit_invocation: true

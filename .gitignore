@@ -1,0 +1,20 @@
+# Private runs and downloaded papers must stay outside this public repository.
+/work/
+/runs/
+/output/
+/papers/
+/test_artifacts/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.env
+*.pdf
+*.docx
+*.xlsx
+*.pptx
+*.tif
+*.tiff
+*.zip
+*.log
+*.part

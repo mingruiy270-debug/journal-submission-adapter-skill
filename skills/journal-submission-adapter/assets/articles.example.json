@@ -1,0 +1,15 @@
+{
+  "articles": [
+    {
+      "id": "P01",
+      "title": "Replace with the exact selected article title",
+      "doi": "",
+      "journal": "Replace with the verified journal name",
+      "published_online": "2026-10-01",
+      "landing_url": "https://example.org/article",
+      "full_text_url": "https://example.org/article.pdf",
+      "format": "pdf",
+      "access": "open_access"
+    }
+  ]
+}

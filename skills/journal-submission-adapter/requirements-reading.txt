@@ -1,0 +1,2 @@
+# Optional: the main agent workflow and downloader need no Python dependencies.
+PyMuPDF>=1.24.3,<2
