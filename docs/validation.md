@@ -20,6 +20,8 @@ These outcomes validate failure handling and honest completion reporting, not su
 
 The skill distinguishes browser-readable fallback from local acquisition, and selected-paper count from completed-reading count. Partial reading can support only section-specific observations. Download failures now record safe error classes/categories without exception messages or URL query secrets. Narrative guidance explicitly checks abstract endings and cover letters for repeated negative limitations.
 
+A narrow local writing-regression pass reduced repeated defensive negations while preserving the synthetic numerical results. The follow-up review also made structured-abstract section roles explicit, so finding-first wording is not interpreted as placing Results in Background. This regression did not add full-paper coverage or exercise Word formatting.
+
 The portable-filename checks reject case-insensitive collisions and Windows reserved names. Optional PDF dependencies are bundled inside the installable skill; their minimum version matches the actual `pymupdf` module interface.
 
 ## Not Covered

@@ -29,6 +29,8 @@ Title: name the subject and distinguish the contribution. Choose descriptive or 
 
 Abstract: lead with the question, not methods inventory. Give the decisive observations and necessary numbers. Separate different endpoints and designs. Follow the official structured/unstructured rule and word limit. Define essential abbreviations; remove those used once. Closing interpretation should answer the opening question.
 
+In a structured abstract, keep each section's job: Background establishes the problem/question; Methods states the design; Results gives the findings; Conclusions interprets the answer. Finding-first Results and cover-letter writing does not mean moving results into the Background subsection.
+
 Introduction: establish the biological problem, identify the specific unresolved relation and explain why this design can address it. Keep general background short. Do not declare every technique a research gap.
 
 Results: choose a sequence of scientific questions. Each subsection starts with the finding, provides the evidence and ends with the next logical question only where a transition is useful. Move diagnostics or duplicate displays to supplementary material only within the authorized scope; retain results that materially bound the main interpretation.
