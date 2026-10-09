@@ -51,6 +51,8 @@ Save through MCP, close/reopen the final derived document and inspect content an
 
 Check effective paragraph/run formatting after text insertion: new prose can inherit heading boldness or keep-with-next rules. Explicitly restore intended body formatting without stripping scientific italics, superscripts or field structure. For captures, verify the visible page/anchor rather than relying on a requested page number alone.
 
+If a successful capture shows the wrong anchor, it has not passed visual review. Verify the full document path, activate the task-owned window and use a supported navigation operation for a bounded retry. Do not interpret correct page-text metadata as proof of the screenshot's location. If the mismatch persists, record the affected visual checks as incomplete while reporting separately validated content checks; do not loop indefinitely or certify those pages.
+
 Use Word MCP snapshot/layout tools when available. Do not generate an extra PDF if the user does not need one; temporary rendering, if required for inspection, stays in the working area. An empty layout-diagnostics list is useful but not a substitute for visual review.
 
 Confirm numerical values, citation payloads, meaningful formatting and images were preserved except for explicitly authorized changes. Recheck figure/table/supplement callouts after reordering. Close only documents opened for this task after saving to avoid leaving upload files locked. Deliver editable DOCX and accurate validation scope.

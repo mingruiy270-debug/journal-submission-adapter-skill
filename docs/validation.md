@@ -18,7 +18,7 @@ An installed stdio Word MCP was connected successfully (122 tools, 46 live). It 
 
 Read-only OOXML comparisons confirmed all 70 complete Zotero citation payloads and the bibliography field were unchanged, together with the editable table and all eight embedded figure media files. The eight separate figure files were also unchanged. No citations were added, reordered or restyled; Zotero Refresh was therefore not invoked. Field preservation here is not proof that insertion or Refresh was tested.
 
-Word captures and page text were inspected for the title/abstract, representative changed sections, table, figures, references and one-page cover letter. Search results that repeated table positions and inherited paragraph formatting were handled explicitly. A source statistical annotation remained inconsistent with its reported adjustment; it was reported as unresolved, not cosmetically certified. No analysis was rerun to resolve it.
+Word page text was inspected for the title/abstract, representative changed sections, table, figures and references. Captures confirmed the one-page cover letter and representative table/figure layout. Some requested body-page captures repeatedly displayed preceding pages despite correct page-text metadata; visual confirmation of those changed sections remains incomplete. The workflow now explicitly requires checking visible anchors and reporting persistent navigation/capture mismatches separately from successful content checks. Search results that repeated table positions and inherited paragraph formatting were handled explicitly. A source statistical annotation remained inconsistent with its reported adjustment; it was reported as unresolved, not cosmetically certified. No analysis was rerun to resolve it.
 
 The authenticated journal portal, actual file upload, reviewer-token validity and submission were not tested. No manuscript, author details, downloaded full papers or confidential access credentials were placed in this public repository. No hash manifest was generated.
 
@@ -28,4 +28,4 @@ The initial release included an independent synthetic-manuscript forward test of
 
 ## Remaining Limits
 
-Live citation insertion, citation reorder/style conversion and actual Zotero Refresh; OCR quality; every publisher/access route; a full scientific reanalysis; and authenticated submission form validation remain untested. Behavioral scenarios are test specifications unless an execution above explicitly covers them.
+Live citation insertion, citation reorder/style conversion and actual Zotero Refresh; complete visual confirmation of changed body pages; OCR quality; every publisher/access route; a full scientific reanalysis; and authenticated submission form validation remain untested or incomplete. Behavioral scenarios are test specifications unless an execution above explicitly covers them.
